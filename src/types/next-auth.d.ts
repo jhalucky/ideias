@@ -3,11 +3,13 @@ import NextAuth, { DefaultSession } from "next-auth";
 declare module "next-auth" {
   interface Session {
     user: {
-      id: string; // 👈 add this
+      id: string;
+       username?: string | null;
     } & DefaultSession["user"];
   }
 
   interface User {
-    id: string; // 👈 add this for database user type
+    id: string;
+     username?: string | null;
   }
 }
