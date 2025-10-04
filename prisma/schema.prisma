@@ -13,7 +13,7 @@ model User {
   image        String?
   username     String?   @unique
   email        String?   @unique
-  bio          String?
+  bio           String?  @default("No bio yet")
   createdAt    DateTime  @default(now())
   emailVerified DateTime?
   accounts     Account[] // required by NextAuth
