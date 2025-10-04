@@ -25,7 +25,7 @@ export default function ProfilePage() {
   if (status !== "authenticated") return null;
 
   return (
-    <div className="flex flex-col min-h-screen items-center justify-center bg-gradient-to-b from-black via-blue-950 to-black text-white">
+    <div className="flex flex-col min-h-screen items-center justify-center bg-gradient-to-b from-black via-blue-950 to-black/45 text-white">
       <p className="text-2xl font-semibold">
         Welcome, {session.user?.name || session.user?.email}
       </p>
