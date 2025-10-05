@@ -1,125 +1,157 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { redirect } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { useState } from "react";
-import { Lightbulb, MessageSquare } from "lucide-react";
 
-const EmptyState = ({
-  message,
-  actionText,
-  actionIcon,
-}: {
-  message: string;
-  actionText: string;
-  actionIcon: React.ReactNode;
-}) => (
-  <div className="flex flex-col items-center justify-center py-20 bg-gray-900/60 rounded-2xl border border-gray-700/40 text-center shadow-inner shadow-black/20 space-y-6">
-    <div className="text-indigo-400 animate-pulse">{actionIcon}</div>
-    <p className="text-lg text-gray-400 font-medium">{message}</p>
-    <button className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 rounded-lg text-white font-semibold transition-all shadow-md hover:shadow-indigo-500/20">
-      {actionText}
-    </button>
-  </div>
-);
-
-export default function DashboardPage() {
+export default function ProfilePage() {
   const { data: session, status } = useSession();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<"ideas" | "opinions">("ideas");
+  const [ideas, setIdeas] = useState<any[]>([]);
+  const [opinions, setOpinions] = useState<any[]>([]);
 
-  const ideas: any[] = []; // No ideas yet
-  const opinions: any[] = []; // No opinions yet
+  useEffect(() => {
+    if (status === "unauthenticated") router.push("/auth");
+  }, [status, router]);
 
-  if (status === "loading") {
-    return (
-      <div className="text-center mt-10 text-gray-400 animate-pulse">
-        Loading dashboard...
-      </div>
-    );
-  }
+useEffect(() => {
+  if (!session?.user?.id) return;
 
-  if (status === "unauthenticated" || !session) {
-    redirect("/auth");
-    return null;
-  }
+  const fetchData = async () => {
+    try {
+      const [ideasRes, opinionsRes] = await Promise.all([
+        fetch(`/api/dashboard/ideas?userId=${session.user.id}`),
+        fetch(`/api/dashboard/opinions?userId=${session.user.id}`),
+      ]);
 
-  const user = session.user;
-  const initialLetter = user.name?.[0] || user.username?.[0] || "U";
+      let ideasData: any[] = [];
+      let opinionsData: any[] = [];
+
+      if (ideasRes.ok) {
+        try {
+          ideasData = await ideasRes.json();
+        } catch (err) {
+          console.error("Failed to parse ideas JSON:", err);
+        }
+      } else {
+        console.error("Ideas fetch failed with status:", ideasRes.status);
+      }
+
+      if (opinionsRes.ok) {
+        try {
+          opinionsData = await opinionsRes.json();
+        } catch (err) {
+          console.error("Failed to parse opinions JSON:", err);
+        }
+      } else {
+        console.error("Opinions fetch failed with status:", opinionsRes.status);
+      }
+
+      setIdeas(ideasData);
+      setOpinions(opinionsData);
+    } catch (err) {
+      console.error("Error fetching dashboard data:", err);
+    }
+  };
+
+  fetchData();
+}, [session]);
+
+
+  if (status === "loading") return <div className="p-10">Loading...</div>;
+
+  const dataToShow = activeTab === "ideas" ? ideas : opinions;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-blue-950 to-black/45 text-white p-4 sm:p-8">
-      <div className="max-w-5xl mx-auto">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-8 p-8 rounded-2xl shadow-xl border border-gray-700/60 backdrop-blur">
-          {/* Avatar */}
-          <div className="flex-shrink-0">
-            {user.image ? (
-              <Image
-                src={user.image}
-                alt={user.name || "User"}
-                width={100}
+    <div className="min-h-screen bg-gradient-to-b from-black via-blue-950 to-black/45 p-6">
+      <div className="max-w-4xl mx-auto rounded-2xl shadow-lg p-6 transition-all">
+        <div className="flex flex-col items-center justify-center mb-10">
+          <div className="flex flex-col items-center gap-4">
+            <Image
+              src={session?.user?.image || "/default-avatar.png"}
+              alt="profile"
+              width={100}
                 height={100}
-                className="w-24 h-24 rounded-full object-cover border-4 border-indigo-500 shadow-lg"
-              />
-            ) : (
-              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-4xl font-extrabold border-4 border-indigo-400 shadow-lg">
-                {initialLetter}
-              </div>
-            )}
-          </div>
-
-          {/* Info */}
-          <div className="text-center sm:text-left">
-            <h1 className="text-3xl font-extrabold tracking-tight">
-              {user.name || "New User"}
-            </h1>
-            <p className="text-indigo-400 text-lg mt-1 font-mono">
-              @{user.username || "Set Username"}
-            </p>
-            <p className="text-gray-400 mt-3 text-base italic max-w-lg leading-relaxed">
-              {user.bio || "💡 Share your technical philosophy here."}
+              className="w-30 h-30 rounded-full"
+            />
+            <div>
+              <h2 className="text-3xl font-semibold text-white text-center">
+                {session?.user?.name || "User"}
+              </h2>
+              <p className="text-gray-500 text-xl text-center">
+                @{session?.user?.username || "username"}
+              </p>
+            </div>
+            <p className="text-gray-400 text-center">
+              {session?.user?.bio || "No bio available."}
             </p>
           </div>
-        </div>
 
-        {/* Tabs */}
-        <div className="flex gap-4 border-b border-gray-700 mt-10 mb-6">
-          {[
-            { key: "ideas", label: "My Ideas", icon: <Lightbulb /> },
-            { key: "opinions", label: "My Opinions", icon: <MessageSquare /> },
-          ].map((tab) => (
+         <div className="flex md:flex-row flex-col justify-between items-center w-full mt-10">
+          <div className="flex gap-3 mt-4 md:mt-0">
             <button
-              key={tab.key}
-              onClick={() =>
-                setActiveTab(tab.key as "ideas" | "opinions")
-              }
-              className={`flex items-center gap-2 px-6 py-3 text-lg font-semibold rounded-t-lg transition-all duration-200 ${
-                activeTab === tab.key
-                  ? "text-indigo-400 border-b-2 border-indigo-400 bg-gray-800/60"
-                  : "text-gray-500 hover:text-gray-300 hover:bg-gray-800/30"
+              onClick={() => router.push("/submit-idea")}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition"
+            >
+              Add Idea
+            </button>
+            <button
+              onClick={() => router.push("/submit-opinion")}
+              className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition"
+            >
+              Add Opinion
+            </button>
+          </div>
+        
+        <div className="flex gap-3 mt-4 md:mt-0">
+          <div className="flex bg-gray-200 dark:bg-gray-700 p-1 rounded-full shadow-inner">
+            <button
+              onClick={() => setActiveTab("ideas")}
+              className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
+                activeTab === "ideas"
+                  ? "bg-blue-600 text-white shadow-md"
+                  : "text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
               }`}
             >
-              {tab.icon}
-              {tab.label}
+              Ideas
             </button>
-          ))}
+            <button
+              onClick={() => setActiveTab("opinions")}
+              className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
+                activeTab === "opinions"
+                  ? "bg-green-600 text-white shadow-md"
+                  : "text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
+              }`}
+            >
+              Opinions
+            </button>
+          </div>
+        </div>
+        </div>
         </div>
 
-        {/* Empty State Section */}
-        <div className="transition-all duration-300 ease-in-out">
-          {activeTab === "ideas" ? (
-            <EmptyState
-              message="You haven't submitted any startup ideas yet."
-              actionText="Submit Your First Idea"
-              actionIcon={<Lightbulb className="w-10 h-10" />}
-            />
+        {/* Content */}
+        <div>
+          {dataToShow.length === 0 ? (
+            <p className="text-center text-gray-500 mt-10">
+              No {activeTab} found.
+            </p>
           ) : (
-            <EmptyState
-              message="You haven't cast any votes or opinions yet."
-              actionText="Explore Ideas to Review"
-              actionIcon={<MessageSquare className="w-10 h-10" />}
-            />
+            <ul className="space-y-4">
+              {dataToShow.map((item) => (
+                <li
+                  key={item.id}
+                  className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg hover:scale-[1.01] transition-transform"
+                >
+                  <h3 className="font-semibold text-lg">{item.title}</h3>
+                  <p className="text-gray-600 dark:text-gray-300 mt-1">
+                    {item.description}
+                  </p>
+                </li>
+              ))}
+            </ul>
           )}
         </div>
       </div>

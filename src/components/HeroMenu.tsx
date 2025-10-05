@@ -4,7 +4,7 @@ export default function HeroMenu() {
       <div className="absolute inset-0 bg-blue-600/30 blur-3xl [mask-image:radial-gradient(circle_at_center,white,transparent)]" />
       <div className="relative z-10 p-8">
         <h2 className="text-5xl md:text-6xl font-extrabold bg-gradient-to-r from-blue-400 via-blue-200 to-white bg-clip-text text-transparent drop-shadow-lg">
-          Welcome to <span className="text-blue-400">IDEIAs</span>
+          Welcome to <span className="text-blue-400">IDEIAAs</span>
         </h2>
         <p className="mt-6 text-lg md:text-xl text-gray-300 max-w-2xl mx-auto">
           Dump your <span className="text-blue-400 font-semibold">tech ideas</span> and get
