@@ -36,3 +36,23 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Failed to submit opinion" }, { status: 500 });
   }
 }
+
+export async function GET(req: NextRequest) {
+  try {
+    const url = new URL(req.url);
+    const userId = url.searchParams.get("userId");
+
+    const opinions = await prisma.opinion.findMany({
+      where: userId ? { userId } : undefined,
+      include: {
+        user: { select: { id: true, name: true, username: true } },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return NextResponse.json(opinions, { status: 200 });
+  } catch (err) {
+    console.error("Error fetching opinions:", err);
+    return NextResponse.json([], { status: 500 });
+  }
+}
