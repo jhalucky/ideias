@@ -1,4 +1,8 @@
+import { useRouter } from "next/navigation"
+
 export default function HeroMenu() {
+  const router = useRouter();
+
   return (
     <section className="flex flex-col items-center justify-center min-h-[70vh] text-center overflow-hidden">
       <div className="absolute inset-0 bg-blue-600/30 blur-3xl [mask-image:radial-gradient(circle_at_center,white,transparent)]" />
@@ -11,10 +15,10 @@ export default function HeroMenu() {
           real opinions from the community — support or challenge every idea.
         </p>
         <div className="mt-8 flex gap-4 justify-center">
-          <button className="px-6 py-3 rounded-xl bg-gray-950 hover:bg-blue-500 text-white font-semibold shadow-lg transition-all cursor-pointer">
+          <button onClick={() => router.push("/submit-idea")} className="px-6 py-3 rounded-xl bg-gray-950 hover:bg-blue-500 text-white font-semibold shadow-lg transition-all cursor-pointer">
             Post an Idea
           </button>
-          <button className="px-6 py-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold shadow-lg transition-all cursor-pointer">
+          <button onClick={() => router.push("/ideas")} className="px-6 py-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold shadow-lg transition-all cursor-pointer">
             Browse Ideas
           </button>
         </div>
