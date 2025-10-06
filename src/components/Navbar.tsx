@@ -35,13 +35,15 @@ export default function Navbar() {
         {session?.user ? (
           <div className="flex items-center gap-2">
             {session.user.image && (
-              <Image
-                src={session.user.image}
-                alt={session.user.name || "User"}
-                className="w-8 h-8 rounded-full"
-                height={32}
-                width={32}
-              />
+              <Link href="/profile">
+                <Image
+                  src={session.user.image}
+                  alt={session.user.name || "User"}
+                  className="w-8 h-8 rounded-full"
+                  height={32}
+                  width={32}
+                />
+              </Link>
             )}
             <span className="text-white">{session.user.name}</span>
             {/* <button
@@ -63,3 +65,5 @@ export default function Navbar() {
     </nav>
   );
 }
+
+
