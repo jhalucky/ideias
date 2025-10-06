@@ -99,12 +99,7 @@ useEffect(() => {
             >
               Add Idea
             </button>
-            <button
-              onClick={() => router.push("/submit-opinion")}
-              className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition"
-            >
-              Add Opinion
-            </button>
+          
           </div>
         
         <div className="flex gap-3 mt-4 md:mt-0">
