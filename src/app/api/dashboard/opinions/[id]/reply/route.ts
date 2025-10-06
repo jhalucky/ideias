@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user?.id) {
@@ -16,7 +16,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       return NextResponse.json({ error: "Reply content required" }, { status: 400 });
     }
 
-    const opinionId = params.id;
+    const opinionId = (await params).id;
 
     const reply = await prisma.reply.create({
       data: {
