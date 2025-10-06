@@ -1,18 +1,19 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  try {
-    const { id } = await params;
+export async function GET(
+  req: Request,
+  context: { params: Promise<{ id: string }> }
+) {
+  const { id } = await context.params;
 
+  try {
     const idea = await prisma.idea.findUnique({
       where: { id },
       include: { user: { select: { name: true, username: true } } },
     });
 
-    if (!idea) {
-      return NextResponse.json({ error: "Idea not found" }, { status: 404 });
-    }
+    if (!idea) return NextResponse.json({ error: "Idea not found" }, { status: 404 });
 
     const opinions = await prisma.opinion.findMany({
       where: { ideaId: id },
@@ -29,7 +30,6 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     return NextResponse.json({ idea, opinions }, { status: 200 });
   } catch (error) {
     console.error("Error fetching idea opinions:", error);
-    return NextResponse.json({ error: "Failed to load opinions" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to load idea and opinions" }, { status: 500 });
   }
 }
-
