@@ -11,7 +11,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     if (!idea) return NextResponse.json({ error: "Idea not found" }, { status: 404 });
 
     const opinions = await prisma.opinion.findMany({
-      where: { ideaId: params.id },
+      where: { ideaId: (await params).id },
       include: {
         user: { select: { name: true, username: true } },
         replies: {
