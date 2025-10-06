@@ -21,6 +21,7 @@ model User {
   ideas        Idea[]
   opinions     Opinion[]
   votes        Vote[]
+  replies     Reply[]
 }
 
 model Account {
@@ -65,6 +66,7 @@ model Opinion {
   userId      String
   opinionType String
   content     String?
+  replies     Reply[]
   createdAt   DateTime   @default(now())
   idea        Idea       @relation(fields: [ideaId], references: [id])
   user        User       @relation(fields: [userId], references: [id])
@@ -82,3 +84,14 @@ model Vote {
 
   @@unique([opinionId, userId])
 }
+
+model Reply {
+  id          String   @id @default(cuid())
+  content     String
+  createdAt   DateTime @default(now())
+  opinionId   String
+  userId      String
+  opinion     Opinion  @relation(fields: [opinionId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
+}
+

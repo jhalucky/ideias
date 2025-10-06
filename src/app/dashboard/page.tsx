@@ -60,7 +60,7 @@ useEffect(() => {
 }, [session]);
 
 
-  if (status === "loading") return <div className="p-10">Loading...</div>;
+  if (status === "loading") return <div className="p-10 text-center">Loading...</div>;
 
   const dataToShow = activeTab === "ideas" ? ideas : opinions;
 
