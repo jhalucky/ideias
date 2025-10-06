@@ -8,20 +8,20 @@ datasource db {
 }
 
 model User {
-  id           String    @id @default(uuid())
-  name         String?
-  image        String?
-  username     String?   @unique
-  email        String?   @unique
-  bio           String?  @default("No bio yet")
-  createdAt    DateTime  @default(now())
+  id            String    @id @default(uuid())
+  name          String?
+  image         String?
+  username      String?   @unique
+  email         String?   @unique
+  bio           String?   @default("No bio yet")
+  createdAt     DateTime  @default(now())
   emailVerified DateTime?
-  accounts     Account[] // required by NextAuth
-  sessions     Session[] // required by NextAuth
-  ideas        Idea[]
-  opinions     Opinion[]
-  votes        Vote[]
-  replies     Reply[]
+  accounts      Account[] // required by NextAuth
+  sessions      Session[] // required by NextAuth
+  ideas         Idea[]
+  opinions      Opinion[]
+  votes         Vote[]
+  replies       Reply[]
 }
 
 model Account {
@@ -61,16 +61,16 @@ model Idea {
 }
 
 model Opinion {
-  id          String    @id @default(uuid())
+  id          String   @id @default(uuid())
   ideaId      String
   userId      String
   opinionType String
   content     String?
-  replies     Reply[]
-  createdAt   DateTime   @default(now())
-  idea        Idea       @relation(fields: [ideaId], references: [id])
-  user        User       @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+  idea        Idea     @relation(fields: [ideaId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
   votes       Vote[]
+  replies     Reply[]
 }
 
 model Vote {
@@ -86,12 +86,11 @@ model Vote {
 }
 
 model Reply {
-  id          String   @id @default(cuid())
-  content     String
-  createdAt   DateTime @default(now())
-  opinionId   String
-  userId      String
-  opinion     Opinion  @relation(fields: [opinionId], references: [id])
-  user        User     @relation(fields: [userId], references: [id])
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+  opinionId String
+  userId    String
+  opinion   Opinion  @relation(fields: [opinionId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 }
-
