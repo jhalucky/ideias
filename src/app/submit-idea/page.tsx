@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import Navbar from "@/components/Navbar";
 
 export default function SubmitIdeaPage() {
   const { data: session, status } = useSession();
@@ -50,7 +51,9 @@ export default function SubmitIdeaPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-blue-950 to-black/45 p-6 flex justify-center items-start">
+    <div className="min-h-screen bg-gradient-to-b from-black via-blue-950 to-black/45 p-6 justify-center">
+      <Navbar />
+      <div className="flex flex-col items-center justify-center mt-10">
       <div className="max-w-2xl w-full bg-gray-900 p-8 rounded-2xl shadow-lg text-white mt-12">
         <h1 className="text-3xl font-bold mb-6 text-center">Submit Your Idea</h1>
 
@@ -89,6 +92,7 @@ export default function SubmitIdeaPage() {
           </button>
         </form>
       </div>
+    </div>
     </div>
   );
 }
