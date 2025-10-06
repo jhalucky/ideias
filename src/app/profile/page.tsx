@@ -2,19 +2,42 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function ProfilePage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/auth"); // redirect to sign-in page
-    }
-  }, [status, router]);
+    async function checkUser() {
+      if (status === "unauthenticated") {
+        router.push("/auth");
+        return;
+      }
 
-  if (status === "loading") {
+      if (status === "authenticated" && session?.user?.email) {
+        try {
+          // check if user exists in DB
+          const res = await fetch(`/api/profile/check?email=${session.user.email}`);
+          const data = await res.json();
+
+          if (data.exists) {
+            router.push("/dashboard"); // redirect to dashboard if user already has profile
+          } else {
+            setChecking(false); // show "Claim your profile" button
+          }
+        } catch (error) {
+          console.error("Error checking user:", error);
+          setChecking(false);
+        }
+      }
+    }
+
+    checkUser();
+  }, [status, session, router]);
+
+  if (status === "loading" || checking) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-black via-blue-950 to-black/45 text-white">
         <p>Loading...</p>
