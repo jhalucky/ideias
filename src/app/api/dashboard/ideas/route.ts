@@ -33,15 +33,20 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    const url = new URL(req.url);
+    const userId = url.searchParams.get("userId"); // ✅ extract userId
+
     const ideas = await prisma.idea.findMany({
+      where: userId ? { userId } : undefined, // ✅ filter if userId exists
       orderBy: { createdAt: "desc" },
       include: {
         user: { select: { id: true, name: true, username: true } },
         _count: { select: { opinions: true } },
       },
     });
+
     return NextResponse.json(ideas, { status: 200 });
   } catch (error) {
     console.error("Error fetching ideas:", error);
