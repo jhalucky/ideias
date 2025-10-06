@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation"; // 1. Import useRouter
+import { useRouter } from "next/navigation";
 
 export default function ProfileSetupPage() {
   const [username, setUsername] = useState("");
   const [bio, setBio] = useState("");
   const [loading, setLoading] = useState(true);
-  const router = useRouter(); // 2. Initialize useRouter
+  const router = useRouter(); 
 
   useEffect(() => {
     async function fetchProfile() {
@@ -35,21 +35,10 @@ export default function ProfileSetupPage() {
         body: JSON.stringify({ username, bio }),
       });
       if (res.ok) {
-        // --- Success Handling (Replaced alert with toast + redirect) ---
-        
-        // 1. Show Toast Notification (Simulation)
         console.log("SUCCESS: Profile saved! Redirecting..."); 
-        
-        // 2. Refresh session data (Crucial step that would happen here with a real library like NextAuth update())
-        // For now, we simulate success and redirect immediately
-        
-        // 3. Redirect to /dashboard
         router.push("/dashboard"); 
       } else {
-        // Handle API errors like username taken (409)
         const errorData = await res.json();
-        
-        // Display user-friendly error (simulating a toast/modal)
         console.error(`ERROR: ${errorData.error}`);
         alert(`Error: ${errorData.error}`);
       }
