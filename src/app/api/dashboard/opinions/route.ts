@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session || !session.user?.id) {
@@ -37,13 +38,17 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET(req: NextRequest) {
-  try {
-    const url = new URL(req.url);
-    const userId = url.searchParams.get("userId");
 
+export async function GET(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user?.id) {
+    return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+  }
+
+  try {
     const opinions = await prisma.opinion.findMany({
-      where: userId ? { userId } : undefined,
+      where: { userId: session.user.id },
       include: {
         user: { select: { id: true, name: true, username: true } },
       },
@@ -53,6 +58,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(opinions, { status: 200 });
   } catch (err) {
     console.error("Error fetching opinions:", err);
-    return NextResponse.json([], { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch opinions" }, { status: 500 });
   }
 }
